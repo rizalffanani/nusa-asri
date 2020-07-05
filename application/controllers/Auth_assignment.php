@@ -1,0 +1,151 @@
+<?php
+
+if (!defined('BASEPATH'))
+    exit('No direct script access allowed');
+
+class Auth_assignment extends CI_Controller
+{
+    
+        
+    function __construct()
+    {
+        parent::__construct();
+        $this->authclass->check_isvalidated(base_url());
+        $this->load->model('Auth_assignment_model');
+        $this->load->library('form_validation');
+    }
+
+    public function index()
+    {
+        $auth_assignment = $this->Auth_assignment_model->get_all();
+
+        $data = array(
+            'title'=>'Auth Assignment list',
+            'auth_assignment_data' => $auth_assignment
+        );
+
+        $this->template->load('template','admin/auth_assignment/auth_assignment_list', $data);
+    }
+
+    public function read($id) 
+    {
+        $row = $this->Auth_assignment_model->get_by_id($id);
+        if ($row) {
+            $data = array(
+                'title'=>'Auth Assignment Read',
+        		'id_assignment' => $row->id_assignment,
+        		'item_name' => $row->item_name,
+        		'user_id' => $row->user_id,
+        		'created_at' => $row->created_at,
+        	);
+            $this->template->load('template','admin/auth_assignment/auth_assignment_read', $data);
+        } else {
+            $this->session->set_flashdata('message', 'Record Not Found');
+            redirect(site_url('auth_assignment'));
+        }
+    }
+
+    public function create() 
+    {
+        $data = array(
+            'button' => 'Create',
+            'title'=>'Auth Assignment Create',
+            'action' => site_url('auth_assignment/create_action'),
+	    'id_assignment' => set_value('id_assignment'),
+	    'item_name' => set_value('item_name'),
+	    'user_id' => set_value('user_id'),
+	    'created_at' => set_value('created_at'),
+	);
+        $this->template->load('template','admin/auth_assignment/auth_assignment_form', $data);
+    }
+    
+    public function create_action() 
+    {
+        $this->_rules();
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->create();
+        } else {
+            $data = array(
+		'item_name' => $this->input->post('item_name',TRUE),
+		'user_id' => $this->input->post('user_id',TRUE),
+		'created_at' => $this->input->post('created_at',TRUE),
+	    );
+
+            $this->Auth_assignment_model->insert($data);
+            $this->session->set_flashdata('message', 'Create Record Success');
+            redirect(site_url('auth_assignment'));
+        }
+    }
+    
+    public function update($id) 
+    {
+        $row = $this->Auth_assignment_model->get_by_id($id);
+
+        if ($row) {
+            $data = array(
+                'button' => 'Update',
+                'title'=>'Auth Assignment Update',
+                'action' => site_url('auth_assignment/update_action'),
+		'id_assignment' => set_value('id_assignment', $row->id_assignment),
+		'item_name' => set_value('item_name', $row->item_name),
+		'user_id' => set_value('user_id', $row->user_id),
+		'created_at' => set_value('created_at', $row->created_at),
+	    );
+            $this->template->load('template','admin/auth_assignment/auth_assignment_form', $data);
+        } else {
+            $this->session->set_flashdata('message', 'Record Not Found');
+            redirect(site_url('auth_assignment'));
+        }
+    }
+    
+    public function update_action() 
+    {
+        $this->_rules();
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->update($this->input->post('id_assignment', TRUE));
+        } else {
+            $data = array(
+		'item_name' => $this->input->post('item_name',TRUE),
+		'user_id' => $this->input->post('user_id',TRUE),
+		'created_at' => $this->input->post('created_at',TRUE),
+	    );
+
+            $this->Auth_assignment_model->update($this->input->post('id_assignment', TRUE), $data);
+            $this->session->set_flashdata('message', 'Update Record Success');
+            redirect(site_url('auth_assignment'));
+        }
+    }
+    
+    public function delete($id) 
+    {
+        $row = $this->Auth_assignment_model->get_by_id($id);
+
+        if ($row) {
+            $this->Auth_assignment_model->delete($id);
+            $this->session->set_flashdata('message', 'Delete Record Success');
+            redirect(site_url('auth_assignment'));
+        } else {
+            $this->session->set_flashdata('message', 'Record Not Found');
+            redirect(site_url('auth_assignment'));
+        }
+    }
+
+    public function _rules() 
+    {
+	$this->form_validation->set_rules('item_name', 'item name', 'trim|required');
+	$this->form_validation->set_rules('user_id', 'user id', 'trim|required');
+	$this->form_validation->set_rules('created_at', 'created at', 'trim|required');
+
+	$this->form_validation->set_rules('id_assignment', 'id_assignment', 'trim');
+	$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
+    }
+
+}
+
+/* End of file Auth_assignment.php */
+/* Location: ./application/controllers/Auth_assignment.php */
+/* Please DO NOT modify this information : */
+/* Generated by Harviacode Codeigniter CRUD Generator 2019-03-13 17:11:13 */
+/* http://harviacode.com */
