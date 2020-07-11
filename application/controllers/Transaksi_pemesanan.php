@@ -127,7 +127,7 @@ class Transaksi_pemesanan extends CI_Controller
         if ($this->form_validation->run() == FALSE) {
             $this->create();
         } else {
-            print_r($this->input->post());
+            // print_r($this->input->post());
             $data = array(
         		'id_transaksi_pemesanan' => $this->input->post('id_transaksi_pemesanan',TRUE),
                 'tanggal_transaksi' => $this->input->post('tanggal_transaksi',TRUE),
@@ -139,8 +139,9 @@ class Transaksi_pemesanan extends CI_Controller
         		'jenis_pembayaran' => $this->input->post('jenis_pembayaran',TRUE),
         		'metode_pembayaran' => $this->input->post('metode_pembayaran',TRUE),
         		'jml_pembayaran' => $this->input->post('jml_pembayaran',TRUE),
-        		'status' => 'pesanan diterima',
+        		'status' => '',
                 'total' => $this->input->post('total',TRUE),
+                'id_user' => $this->session->userdata("id"),
     	    );
             $this->Transaksi_pemesanan_model->insert('transaksi_pemesanan',$data);
 
@@ -306,7 +307,7 @@ class Transaksi_pemesanan extends CI_Controller
         }
         ?>
         <td>
-            <input type="text" class="form-control" name="nama_barang[]" id="nama_barang<?= $a?>" placeholder="barang" onclick="angka('<?= $rowid?>',<?= $a?>)" data-toggle="modal" data-target="#modal-lg"/>
+            <input type="text" class="form-control" name="nama_barang[]" id="nama_barang<?= $a?>" placeholder="barang" onclick="angka('<?= $rowid?>',<?= $a?>)" onchange="nama(this.value,'<?= $rowid; ?>')" data-toggle="modal" data-target="#modal-lg"/>
         </td>
         <td>
             <input type="number" class="form-control" name="qtys[]" id="qtys<?= $a?>" placeholder="Qty" value="0" min="0" onchange="plus(this.value,<?= $a?>)" mk<?= $a?>="<?= $a?>" />
@@ -322,7 +323,7 @@ class Transaksi_pemesanan extends CI_Controller
     }
 
     public function tabel2(){
-        $a = $this->input->post('a',TRUE);?>
+        $a = $this->input->post('a',TRUE);$b = $this->input->post('b',TRUE);?>
             <td>
               <input type="text" class="form-control" name="nama_kain[]" id="nama_kain<?= $a?>" placeholder="Nama Kain" />
             </td>
@@ -334,12 +335,31 @@ class Transaksi_pemesanan extends CI_Controller
             </select>
             </td>
             <td>
-              <input type="number" class="form-control"  name="ukuran[]" id="ukuran<?= $a?>" placeholder="Ukuran" min="1">
+                <?php if($b==1){?>
+                    <div class="row">
+                        <div class="col-6">
+                            <input type="number" class="form-control"  name="ukuran2[]" id="ukuran<?= $a?>2" placeholder="Lebar" value="0" min="1">
+                        </div>
+                        <div class="col-6">
+                            <input type="number" class="form-control"  name="ukuran[]" id="ukuran<?= $a?>" placeholder="Tinggi" value="0" min="1" onchange="fos(<?= $a?>)">
+                        </div>
+                    </div>
+                <?php }elseif($b==2){?>
+                    <select class="form-control"  name="ukuran[]" id="ukuran<?= $a?>" onchange="fos(<?= $a?>)">
+                        <option value="0">Pilih Ukuran</option>
+                        <option value="2.65">3 kaki</option>
+                        <option value="2.95">4 kaki</option>
+                        <option value="3.25">5 kaki</option>
+                        <option value="3.45">6 kaki</option>
+                    </select>
+                <?php }elseif($b==3){?>
+                    <input type="number" class="form-control"  name="ukuran[]" id="ukuran<?= $a?>" placeholder="Ukuran" value="0" min="1" onchange="fos(<?= $a?>)">
+                <?php }?>
             </td>
             <td>
               <input type="text" class="form-control" name="pemakaian[]" id="pemakainn<?= $a?>" placeholder="Pemakaian" />
             </td>
-            <td><input type="number" class="form-control"  name="hrga[]" id="hrga<?= $a?>" placeholder="Harga" min="1"></td>
+            <td><input type="number" class="form-control"  name="hrga[]" id="hrga<?= $a?>" placeholder="Harga" min="1" value="0"  onchange="fos(<?= $a?>)"></td>
             <td><button type="button" class="btn btn-block btn-danger" onclick="hapus(this)"><i class="fas fa-times"></i></button></td>
     <?php
     }
@@ -349,10 +369,10 @@ class Transaksi_pemesanan extends CI_Controller
         $datas= array(
             'rowid' => $this->input->post('acak'),
             'id' => $this->input->post('id'),
-            'name' => $this->input->post('produk1'),
-            'price' => $this->input->post('harga1'),
-            'qty' => $this->input->post('qty1'), 
-            'names' => $this->input->post('produk1'),
+            'name' => '_',
+            'price' => $this->input->post('totaldetail'),
+            'qty' => 1, 
+            'names' => '_',
             'unit' => $this->input->post('unit1'), 
             'id_barang_pesanan' => $this->input->post('id_barang_pesanan'), 
             'value' => $this->input->post('value'), 
@@ -362,9 +382,22 @@ class Transaksi_pemesanan extends CI_Controller
             'ukuran' => $this->input->post('ukuran'), 
             'pemakaian' => $this->input->post('pemakaian'), 
             'hrga' => $this->input->post('hrga'), 
+            'tambahan_barang' => $this->input->post('produk1'), 
+            'qty_tambahan' => $this->input->post('qty1'), 
+            'harga_tambahan' => $this->input->post('harga1'), 
         );
         $this->cart->update($datas);
         echo(json_encode($this->cart->contents()[$this->input->post('acak')]));
+    }
+     public function gantinama()
+    {
+        $datas= array(
+            'rowid' => $this->input->post('b'),
+            'name' => $this->input->post('a'),
+            'names' => $this->input->post('a'),
+        );
+        $this->cart->update($datas);
+        echo(json_encode($this->cart->contents()[$this->input->post('b')]));
     }
 
     public function deklar($id)
@@ -384,6 +417,9 @@ class Transaksi_pemesanan extends CI_Controller
             'ukuran' => 0, 
             'pemakaian' => "", 
             'hrga' => 0, 
+            'tambahan_barang' => "", 
+            'qty_tambahan' => 0, 
+            'harga_tambahan' => 0, 
         );
         $this->cart->insert($datas);
     }

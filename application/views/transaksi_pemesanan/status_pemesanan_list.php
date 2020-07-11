@@ -1,4 +1,5 @@
-<div class="row">
+
+        <link rel="stylesheet" href="<?php echo base_url() ?>assets/datatables/dataTables.bootstrap.css"><div class="row">
           <div class="col-md-4 col-sm-6 col-12">
             <div class="info-box bg-info">
 
@@ -49,8 +50,6 @@
                     <th>Nomor Order</th>
             		    <th>Nama Pelanggan</th>
             		    <th>Tanggal Selesai</th>
-            		    <!-- <th>Kurir</th> -->
-            		    <!-- <th>Potongan</th> -->
                     <th>Total</th>
             		    <th>Jenis Pembayaran</th>
             		    <th>Terbayaran</th>
@@ -60,41 +59,76 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $i=1; foreach ($data as $key => $value) {?>
-                <tr>
-                    <td><?= $i?></td>
-                    <td><?= $value->tanggal_transaksi?></td>
-                    <td><?= $value->id_transaksi_pemesanan?></td>
-                    <td><?= $value->nama_pelanggan?></td>
-                    <td><?= $value->tanggal_selesai?></td>
-                    <!-- <td><?= $value->kurir?></td> -->
-                    <!-- <td><?= ($value->potongan=="Rp") ? $value->potongan." ".rupiah($value->jumlah_potongan) : $value->jumlah_potongan." ".$value->potongan ; ?></td> -->
-                    <td><?= "Rp ".rupiah($value->total)?></td>
-                    <td><?= $value->metode_pembayaran." ".$value->jenis_pembayaran?></td>
-                    <td><?= "Rp ".rupiah($value->jml_pembayaran)?></td>
-                    <td><?= "Rp ".rupiah($value->total-$value->jml_pembayaran)?></td>
-                    <td>
-                      <select class="form-control select2" onchange="reload(this.value,<?= $value->id_transaksi_pemesanan?>)">
-                        <option value="1" <?php echo ($value->status=="pesanan diterima") ? 'selected' : '' ; ?>>pesanan diterima</option>
-                        <option value="2" <?php echo ($value->status=="sudah dipotong") ? 'selected' : '' ; ?>>sudah dipotong</option>
-                        <option value="3" <?php echo ($value->status=="dijahit") ? 'selected' : '' ; ?>>dijahit</option>
-                        <option value="4" <?php echo ($value->status=="finishing") ? 'selected' : '' ; ?>>finishing</option>
-                        <option value="5" <?php echo ($value->status=="pesanan selesai") ? 'selected' : '' ; ?>>pesanan selesai</option>
-                      </select>
-                    </td>
-                    <td>
-                      <?= anchor(site_url('transaksi_pemesanan/read/'.$value->id_transaksi_pemesanan),'Read');?>                    
-                    </td>
-                </tr>
-                <?php $i++;}?>
+                
             </tbody>
         </table>
         <script src="<?php echo base_url('assets/js/jquery-1.11.2.min.js') ?>"></script>
         <script src="<?php echo base_url('assets/datatables/jquery.dataTables.js') ?>"></script>
         <script src="<?php echo base_url('assets/datatables/dataTables.bootstrap.js') ?>"></script>
         <script type="text/javascript">
+            // $(document).ready(function() {
+            //     $('#mytable').DataTable();
+            // } );
+            /* Formatting function for row details - modify as you need */
+            function format ( d ) {
+              // alert(d.log);
+                // `d` is the original data object for the row
+                var hs = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+                    '<h3>Riwayat</h3>'+
+                    '<tr>'+
+                        '<td>Dibuat Oleh:</td>'+
+                        '<td>('+d.id_user+')-('+d.tanggal_transaksi+')</td>'+
+                    '</tr>';
+                    for (var i = 0; i < d.log.length; i++) {
+                      hs += '<tr>'+
+                          '<td>['+d.log[i].date+','+d.log[i].time+']</td>'+
+                          '<td>'+d.log[i].idser+': Pesanan '+d.log[i].status+'</td>'+
+                      '</tr>';
+                    }                    
+                    hs += '</table>'
+                return hs;
+            }
+             
             $(document).ready(function() {
-                $('#mytable').DataTable();
+                var table = $('#mytable').DataTable( {
+                    "ajax": "<?php echo base_url() ?>status_pemesanan/json",
+                    "columns": [
+                        {
+                            "className":      'details-control',
+                            "orderable":      false,
+                            "data":           null,
+                            "defaultContent": ''
+                        },
+                        { "data": "tanggal_transaksi" },
+                        { "data": "id_transaksi_pemesanan" },
+                        { "data": "nama_pelanggan" },
+                        { "data": "tanggal_selesai" },
+                        { "data": "total" },
+                        { "data": "metode_pembayaran" },
+                        { "data": "jml_pembayaran" },
+                        { "data": "kembali" },
+                        { "data": "status" },
+                        { "data": "action" },
+                    ],
+                    "order": [[1, 'asc']]
+                } );
+                 
+                // Add event listener for opening and closing details
+                $('#mytable tbody').on('click', 'td.details-control', function () {
+                    var tr = $(this).closest('tr');
+                    var row = table.row( tr );
+             
+                    if ( row.child.isShown() ) {
+                        // This row is already open - close it
+                        row.child.hide();
+                        tr.removeClass('shown');
+                    }
+                    else {
+                        // Open this row
+                        row.child( format(row.data()) ).show();
+                        tr.addClass('shown');
+                    }
+                } );
             } );
             function reload(a,b) {
               window.location = "<?php echo base_url() ?>status_pemesanan/update_action/"+a+'/'+b;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 05, 2020 at 09:24 PM
+-- Generation Time: Jul 11, 2020 at 09:10 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.2
 
@@ -264,6 +264,45 @@ INSERT INTO `jenis_barang_pesanan_model` (`id`, `id_barang_pesanan`, `model`) VA
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `log_pemasanan`
+--
+
+CREATE TABLE `log_pemasanan` (
+  `id_log` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `time` time NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `status` varchar(100) NOT NULL,
+  `id_transaksi_pemesanan` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `log_pemasanan`
+--
+
+INSERT INTO `log_pemasanan` (`id_log`, `date`, `time`, `id_user`, `status`, `id_transaksi_pemesanan`) VALUES
+(1, '2020-07-10', '14:54:45', 1, 'sudah dipotong', 5),
+(2, '2020-07-10', '14:54:57', 1, 'dijahit', 3),
+(3, '2020-07-10', '14:55:05', 1, 'finishing', 3),
+(4, '2020-07-10', '14:55:14', 1, 'pesanan selesai', 3),
+(5, '2020-07-10', '11:29:54', 1, 'dijahit', 5),
+(6, '2020-07-10', '15:34:09', 1, 'pesanan diterima', 8),
+(7, '2020-07-10', '15:35:28', 1, 'selesai', 6),
+(8, '2020-07-10', '15:35:47', 1, 'finishing', 5),
+(9, '2020-07-10', '15:35:54', 1, 'selesai', 6),
+(10, '2020-07-10', '15:35:57', 1, 'finishing', 6),
+(11, '2020-07-10', '15:36:01', 1, 'finishing', 8),
+(12, '2020-07-10', '15:36:04', 1, 'finishing', 7),
+(13, '2020-07-10', '15:36:07', 1, 'selesai', 5),
+(14, '2020-07-10', '15:38:40', 1, 'selesai', 6),
+(15, '2020-07-10', '15:38:42', 1, 'selesai', 8),
+(16, '2020-07-10', '15:40:50', 1, 'selesai', 6),
+(17, '2020-07-10', '15:40:54', 1, 'selesai', 8),
+(18, '2020-07-10', '15:40:56', 1, 'selesai', 7);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `menu`
 --
 
@@ -343,21 +382,25 @@ CREATE TABLE `transaksi_pemesanan` (
   `jenis_pembayaran` enum('dp','lunas') NOT NULL,
   `metode_pembayaran` enum('cash','transfer') NOT NULL,
   `jml_pembayaran` int(100) NOT NULL,
-  `status` enum('pesanan diterima','sudah dipotong','dijahit','finishing','pesanan selesai','siap dikirim','transaksi selesai') NOT NULL,
-  `total` varchar(100) NOT NULL
+  `status` enum('pesanan diterima','sudah dipotong','dijahit','finishing','pesanan selesai','siap dikirim','transaksi selesai','') NOT NULL,
+  `total` varchar(100) NOT NULL,
+  `id_user` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `transaksi_pemesanan`
 --
 
-INSERT INTO `transaksi_pemesanan` (`id_transaksi_pemesanan`, `tanggal_transaksi`, `id_pelanggan`, `tanggal_selesai`, `kurir`, `potongan`, `jumlah_potongan`, `jenis_pembayaran`, `metode_pembayaran`, `jml_pembayaran`, `status`, `total`) VALUES
-(1, '2020-06-28', 1, '2020-06-30', 'sasa', 'Rp', '500', 'lunas', 'cash', 4500, 'transaksi selesai', '4500'),
-(2, '2020-06-28', 2, '2020-06-30', 'sasa', 'Rp', '1000', 'lunas', 'cash', 39000, 'transaksi selesai', '39000'),
-(3, '2020-06-30', 2, '2020-06-30', 'sasa', 'Rp', '32323', 'lunas', 'cash', 513122, 'pesanan diterima', '513122'),
-(4, '2020-07-05', 1, '2020-07-06', 'sadsa', 'Rp', '231', 'lunas', 'cash', 5464333, 'siap dikirim', '5464333'),
-(5, '2020-07-05', 1, '2020-07-08', 'sasa', 'Rp', '021321', 'dp', 'cash', 230000, 'pesanan diterima', '300000'),
-(6, '2020-07-06', 2, '2020-07-08', 'sasa', 'Rp', '211221', 'dp', 'transfer', 3000000, 'pesanan diterima', '21000000');
+INSERT INTO `transaksi_pemesanan` (`id_transaksi_pemesanan`, `tanggal_transaksi`, `id_pelanggan`, `tanggal_selesai`, `kurir`, `potongan`, `jumlah_potongan`, `jenis_pembayaran`, `metode_pembayaran`, `jml_pembayaran`, `status`, `total`, `id_user`) VALUES
+(1, '2020-06-28', 1, '2020-06-30', 'sasa', 'Rp', '500', 'lunas', 'cash', 4500, 'transaksi selesai', '4500', 1),
+(2, '2020-06-28', 2, '2020-06-30', 'sasa', 'Rp', '1000', 'lunas', 'cash', 39000, 'transaksi selesai', '39000', 1),
+(3, '2020-06-30', 2, '2020-06-30', 'sasa', 'Rp', '32323', 'lunas', 'cash', 513122, 'transaksi selesai', '513122', 1),
+(4, '2020-07-05', 1, '2020-07-06', 'sadsa', 'Rp', '231', 'lunas', 'cash', 5464333, 'transaksi selesai', '5464333', 1),
+(5, '2020-07-05', 1, '2020-07-08', 'sasa', 'Rp', '021321', 'lunas', 'cash', 300000, 'transaksi selesai', '300000', 1),
+(6, '2020-07-06', 2, '2020-07-08', 'sasa', 'Rp', '211221', 'lunas', 'transfer', 21000000, 'transaksi selesai', '21000000', 1),
+(7, '2020-07-10', 2, '2020-07-11', 'sasa', 'Rp', '90000', 'lunas', 'cash', 0, 'transaksi selesai', '0', 1),
+(8, '2020-07-10', 1, '2020-07-17', 'sasa', '%', '2', 'lunas', 'cash', 8820, 'transaksi selesai', '8820', 1),
+(9, '2020-07-11', 1, '2020-07-13', 'sasa', '%', '12', 'lunas', 'transfer', 11374, '', '11374', 1);
 
 -- --------------------------------------------------------
 
@@ -373,24 +416,30 @@ CREATE TABLE `transaksi_pemesanan_detail` (
   `nama_barang` varchar(100) NOT NULL,
   `qty` int(11) NOT NULL,
   `unit` enum('pcs','m') NOT NULL,
-  `harga_barang` int(11) NOT NULL,
+  `harga_barang` varchar(100) NOT NULL,
   `jumlah` int(10) NOT NULL,
-  `id_transaksi_pemesanan` int(11) NOT NULL
+  `id_transaksi_pemesanan` int(11) NOT NULL,
+  `tambahan_barang` varchar(100) NOT NULL,
+  `qty_tambahan` int(11) NOT NULL,
+  `harga_tambahan` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `transaksi_pemesanan_detail`
 --
 
-INSERT INTO `transaksi_pemesanan_detail` (`id`, `id_barang_pesanan`, `value`, `id_barang_pesanan_model`, `nama_barang`, `qty`, `unit`, `harga_barang`, `jumlah`, `id_transaksi_pemesanan`) VALUES
-(1, 1, 'bedcover', 4, 'kain', 2, 'pcs', 1000, 2000, 1),
-(2, 3, '', 1, 'batik', 1, 'm', 3000, 3000, 1),
-(3, 1, NULL, 5, 'arit', 1, 'pcs', 10000, 10000, 2),
-(4, 2, 'poni', 0, 'gfhfh', 1, 'pcs', 20000, 20000, 2),
-(5, 1, 'bedcover', 4, 'mukena', 1, 'pcs', 545445, 545445, 3),
-(6, 1, 'bedcover', 5, 'kain', 1, 'pcs', 5464564, 5464564, 4),
-(7, 2, 'poni', 6, 'amer', 1, 'pcs', 321321, 321321, 5),
-(8, 1, 'bedcover', 5, 'kain', 1, 'pcs', 21211221, 21211221, 6);
+INSERT INTO `transaksi_pemesanan_detail` (`id`, `id_barang_pesanan`, `value`, `id_barang_pesanan_model`, `nama_barang`, `qty`, `unit`, `harga_barang`, `jumlah`, `id_transaksi_pemesanan`, `tambahan_barang`, `qty_tambahan`, `harga_tambahan`) VALUES
+(1, 1, 'bedcover', 4, 'kain', 2, 'pcs', '1000', 2000, 1, '', 0, ''),
+(2, 3, '', 1, 'batik', 1, 'm', '3000', 3000, 1, '', 0, ''),
+(3, 1, NULL, 5, 'arit', 1, 'pcs', '10000', 10000, 2, '', 0, ''),
+(4, 2, 'poni', 0, 'gfhfh', 1, 'pcs', '20000', 20000, 2, '', 0, ''),
+(5, 1, 'bedcover', 4, 'mukena', 1, 'pcs', '545445', 545445, 3, '', 0, ''),
+(6, 1, 'bedcover', 5, 'kain', 1, 'pcs', '5464564', 5464564, 4, '', 0, ''),
+(7, 2, 'poni', 6, 'amer', 1, 'pcs', '321321', 321321, 5, '', 0, ''),
+(8, 1, 'bedcover', 5, 'kain', 1, 'pcs', '21211221', 21211221, 6, '', 0, ''),
+(9, 1, NULL, 4, 'amer', 1, 'pcs', '90000', 90000, 7, '', 0, ''),
+(10, 2, 'poni', 6, 'amer', 1, 'pcs', '9000', 9000, 8, '', 0, ''),
+(11, 2, 'poni', 6, 'rudis', 1, 'pcs', '12925', 12925, 9, '', 0, '');
 
 -- --------------------------------------------------------
 
@@ -421,7 +470,11 @@ INSERT INTO `transaksi_pemesanan_kain` (`id_kain`, `nama_kain`, `bidang`, `ukura
 (6, 'dfs', 'bidang kecil', 54, 'cdscs', 546464, 5),
 (7, 'wol', 'bidang kecil', 1, 'bekas', 37, 6),
 (8, 'wol', 'bidang kecil', 21321, 'bekas', 8, 7),
-(9, 'wol', 'bidang kecil', 21, 'bekas', 23, 8);
+(9, 'wol', 'bidang kecil', 21, 'bekas', 23, 8),
+(10, 'wol', 'bidang kecil', 2, 'bekas', 12, 9),
+(11, 'wol', 'bidang kecil', 1, 'bekas', 13, 10),
+(12, 'wol', 'bidang kecil', 3, 'bekas', 500, 11),
+(13, 'gfh', 'bidang besar', 3, 'bekas', 800, 11);
 
 -- --------------------------------------------------------
 
@@ -779,6 +832,12 @@ ALTER TABLE `jenis_barang_pesanan_model`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `log_pemasanan`
+--
+ALTER TABLE `log_pemasanan`
+  ADD PRIMARY KEY (`id_log`);
+
+--
 -- Indexes for table `menu`
 --
 ALTER TABLE `menu`
@@ -897,6 +956,12 @@ ALTER TABLE `jenis_barang_pesanan_model`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
+-- AUTO_INCREMENT for table `log_pemasanan`
+--
+ALTER TABLE `log_pemasanan`
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
 -- AUTO_INCREMENT for table `menu`
 --
 ALTER TABLE `menu`
@@ -912,19 +977,19 @@ ALTER TABLE `pelanggan`
 -- AUTO_INCREMENT for table `transaksi_pemesanan`
 --
 ALTER TABLE `transaksi_pemesanan`
-  MODIFY `id_transaksi_pemesanan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_transaksi_pemesanan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `transaksi_pemesanan_detail`
 --
 ALTER TABLE `transaksi_pemesanan_detail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `transaksi_pemesanan_kain`
 --
 ALTER TABLE `transaksi_pemesanan_kain`
-  MODIFY `id_kain` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_kain` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `transaksi_pengeluaran`

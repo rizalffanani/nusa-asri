@@ -6,6 +6,7 @@ if (!defined('BASEPATH'))
 class Transaksi_pemesanan_model extends CI_Model
 {
 
+    public $table2 = 'log_pemesanan';
     public $table = 'transaksi_pemesanan';
     public $id = 'id_transaksi_pemesanan';
     public $order = 'DESC';
@@ -45,9 +46,11 @@ class Transaksi_pemesanan_model extends CI_Model
 
     function get_all_p2()
     {
-        $this->db->select('id_transaksi_pemesanan,tanggal_transaksi,transaksi_pemesanan.id_pelanggan,tanggal_selesai,kurir,potongan,jumlah_potongan,jenis_pembayaran,metode_pembayaran,jml_pembayaran,status,total,pelanggan.nama_pelanggan');
+        $this->db->select('id_transaksi_pemesanan,tanggal_transaksi,transaksi_pemesanan.id_pelanggan,tanggal_selesai,kurir,potongan,jumlah_potongan,jenis_pembayaran,metode_pembayaran,jml_pembayaran,status,total,users.first_name,pelanggan.nama_pelanggan');
         $this->db->from($this->table);
         $this->db->join('pelanggan', 'transaksi_pemesanan.id_pelanggan = pelanggan.id_pelanggan'); 
+        $this->db->join('users', 'transaksi_pemesanan.id_user = users.id'); 
+        $this->db->or_where("status",""); 
         $this->db->or_where("status","pesanan diterima"); 
         $this->db->or_where("status","sudah dipotong"); 
         $this->db->or_where("status","dijahit"); 
@@ -69,6 +72,14 @@ class Transaksi_pemesanan_model extends CI_Model
     {
         $this->db->where($whr, $id);
         return $this->db->get($tbl);
+    }    
+    function get_by_id_table_join($tbl,$whr,$id)
+    {
+        $this->db->select('log_pemasanan.date,time,status,id_transaksi_pemesanan,id_user,users.first_name');
+        $this->db->from($tbl);
+        $this->db->join('users', 'log_pemasanan.id_user = users.id');
+        $this->db->where($whr, $id);
+        return $this->db->get();
     }
     function get_pesananditerima()
     {
@@ -138,7 +149,7 @@ class Transaksi_pemesanan_model extends CI_Model
     function insert($table,$data)
     {
         $this->db->insert($table, $data);
-    }
+    }   
 
     // update data
     function update($id, $data)

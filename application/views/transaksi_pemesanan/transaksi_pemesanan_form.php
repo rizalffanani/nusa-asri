@@ -64,7 +64,7 @@
             <?php $i = 1;foreach($this->cart->contents() as $key) : ?>
             <tr id="tr1">
                 <td>
-                    <input type="text" class="form-control" name="nama_barang[]" id="nama_barang<?= $i?>" value="<?= @$key['names']?>" placeholder="barang" onclick="angka('<?= $key['rowid']; ?>',<?= $i?>)" data-toggle="modal" data-target="#modal-lg"/>
+                    <input type="text" class="form-control" name="nama_barang[]" id="nama_barang<?= $i?>" value="<?= @$key['names']?>" placeholder="barang" onclick="angka('<?= $key['rowid']; ?>',<?= $i?>)" onchange="nama(this.value,'<?= $key['rowid']; ?>')" data-toggle="modal" data-target="#modal-lg"/>
                 </td>
                 <td>
                     <input type="number" class="form-control" name="qtys[]" id="qtys<?= $i?>" value="<?= @$key['qty']?>" placeholder="Qty" onchange="plus(this.value,<?= $i?>)" min="0" mk<?= $i?>="<?= $i?>"  />
@@ -98,7 +98,8 @@
                       <a href="<?php echo site_url('transaksi_pemesanan') ?>" class="btn btn-default float-right">Cancel</a>
                     </div>
               </div>
-            </div>              
+            </div>    
+            <?php print_r($this->cart->contents());?>          
         </div>
         <div class="col-md-8">
             <div class="card">
@@ -154,7 +155,7 @@
             <div class="col-sm-4">
               <div class="form-group">
                 <label for="datetime">Set</label>
-                <input type="text" class="form-control" name="set" id="set" placeholder="Set" readonly/>
+                <input type="text" class="form-control" name="set" id="set" placeholder="Set" value="" readonly/>
               </div>
             </div>
             <div class="col-sm-4" id="valueform" style="display: none;">
@@ -192,13 +193,11 @@
                             <option value="bidang besar">bidang besar</option>
                         </select>
                       </td>
-                      <td>
-                          <input type="number" class="form-control"  name="ukuran[]" id="ukuran0" placeholder="Ukuran" min="1">
-                      </td>
+                      <td id="ukurans"></td>
                       <td>
                           <input type="text" class="form-control" name="pemakaian[]" id="pemakainn0" placeholder="Pemakaian" />
                       </td>
-                      <td><input type="number" class="form-control"  name="hrga[]" id="hrga0" placeholder="Harga" min="1"></td>
+                      <td><input type="number" class="form-control"  name="hrga[]" id="hrga0" value="0" min="1" placeholder="Harga" onchange="fos(0)"></td>
                       <td></td>
                   </tr>
                 </tbody>
@@ -212,6 +211,12 @@
                     <select name="jenis_barang_pesanan_model" id="jenis_barang_pesanan_model" class="form-control select2" required></select>
                 </div>
             </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                    <label for="int">Total</label>
+                    <input type="text" name="totaldetail" id="totaldetail" class="form-control" value="0" readonly>
+              </div>
+            </div>
           </div>
           <div class="row">
             <div class="col-sm-12">
@@ -220,7 +225,7 @@
                 <table class="table table-bordered">
                   <thead>                  
                     <tr>
-                      <th>Produk</th>
+                      <th>Nama Barang</th>
                       <th>Qty</th>
                       <th>Unit</th>
                       <th>Harga</th>
@@ -232,7 +237,7 @@
                             <input type="text" class="form-control" name="produk1" id="produk1" placeholder="Nama Produk" />
                         </td>
                         <td>
-                            <input type="number" class="form-control"  name="qty1" id="qty1" placeholder="Qty" min="1">
+                            <input type="number" class="form-control"  name="qty1" id="qty1" onchange="fos()" placeholder="Qty" min="1"/>
                         </td>
                         <td>
                             <select class="form-control" name="unit1" id="unit1" >
@@ -242,7 +247,7 @@
                           </select>
                         </td>
                         <td>
-                            <input type="number" class="form-control" name="harga1" id="harga1" placeholder="Harga" min="1" />
+                            <input type="number" class="form-control" name="harga1" id="harga1" onchange="fos()" placeholder="Harga" min="1"/>
                         </td>
                     </tr>
                   </tbody>
@@ -306,6 +311,7 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+
 <script src="<?php echo base_url() ?>templateadmin/plugins/select2/js/select2.full.min.js"></script>
 <script>
   $(function () {
@@ -326,25 +332,72 @@
     });
   }
   function panggil2(a,b) {
+    var day;
+    switch (a) {
+      case 0:
+        day = '<input type="number" id="ukuran0" class="form-control" readonly>';
+        break;
+      case '1':
+        day = '<div class="row"><div class="col-6"><input type="number" class="form-control"  name="ukuran2[]" id="ukuran02" placeholder="Lebar" value="0" min="1"></div>'+
+        '<div class="col-6"><input type="number" class="form-control"  name="ukuran[]" id="ukuran0" placeholder="Tinggi" value="0" min="1" onchange="fos(0)"></div></div>';
+        break;
+      case '2':
+        day = '<select class="form-control"  name="ukuran[]" id="ukuran0" onchange="fos(0)">'+
+                '<option value="0">Pilih Ukuran</option>'+
+                '<option value="2.65">3 kaki</option>'+
+                '<option value="2.95">4 kaki</option>'+
+                '<option value="3.25">5 kaki</option>'+
+                '<option value="3.45">6 kaki</option>'+
+              '</select>';
+        break;
+      case '3':
+        day = '<input type="number" class="form-control"  name="ukuran[]" id="ukuran0" placeholder="Ukuran" value="0" min="1" onchange="fos(0)">';
+        break;
+    }
+    document.getElementById("ukurans").innerHTML = day;
     $.ajax({
         type:"POST",
         url:"<?=site_url('transaksi_pemesanan/panggil');?>",    
         dataType : "JSON",
         data : {product_code:a},
         success: function(data){   
-            document.getElementById('set').value = data.set_barang;
-            if (data.jenis_barang!="wallpaper") {
-              document.getElementById('valueform').style.display = "";
-              document.getElementById('valuelabel').innerHTML = data.value;
-              document.getElementById('customCheckbox1').value = data.value;
-              if (b) {document.getElementById("customCheckbox1").checked = true;}
-            }else{
-              document.getElementById('valueform').style.display = "none";
-              document.getElementById('valuelabel').innerHTML = "";
-              document.getElementById('customCheckbox1').value = "";
+            if (a>0) {
+              document.getElementById('set').value = data.set_barang;            
+              if (data.jenis_barang!="wallpaper") {
+                document.getElementById('valueform').style.display = "";
+                document.getElementById('valuelabel').innerHTML = data.value;
+                document.getElementById('customCheckbox1').value = data.value;
+                if (b) {document.getElementById("customCheckbox1").checked = true;}
+              }else{
+                document.getElementById('valueform').style.display = "none";
+                document.getElementById('valuelabel').innerHTML = "";
+                document.getElementById('customCheckbox1').value = "";
+              }
             }
         }  
     });
+  }
+  var hitung = 1;
+  var count = 0;
+  function fos(b) {
+    // document.getElementById('totaldetail').value;
+    if (b) { var b = b;}else{ var b = count;}
+    var c = parseInt(b)+1;
+    var ttl = 0;
+
+    for (var i = 0; i < c; i++) {
+      var u = document.getElementById('ukuran'+i).value;
+      var h = document.getElementById('hrga'+i).value;
+      ttl = (parseFloat(u)*parseFloat(h))+ttl;
+    }
+    if (ttl % 1 != 0) {ttl = ttl.toFixed(2);}
+
+    var q = document.getElementById('qty1').value;
+    var r = document.getElementById('harga1').value;    
+    var tts = parseFloat(q)*parseFloat(r);
+    if (tts % 1 != 0) {tts = tts.toFixed(2);}
+
+    document.getElementById('totaldetail').value = ttl+tts;
   }
   function panggil3(a,b) {
     $.ajax({
@@ -357,8 +410,6 @@
         }  
     });
   }
-  var hitung = 1;
-  var count = 0;
   function angka(a,b) {
     count = 0;
     $.ajax({
@@ -368,7 +419,8 @@
         data : {value:a},
         success: function(data){   
           var x = document.getElementById("table2").rows.length;
-          document.getElementById('produk1').value = data.names;
+          document.getElementById('totaldetail').value = data.price;
+          document.getElementById('produk1').value = data.tambahan_barang;
           document.getElementById('qty1').value = data.qty;
           document.getElementById('unit1').value = data.unit;
           document.getElementById('harga1').value = data.price;
@@ -377,9 +429,9 @@
           document.getElementById('acak').value = a;
           document.getElementById('nama_kain0').value = (data.nama_kain[0]) ? data.nama_kain[0]:"";
           document.getElementById('bidang0').value = data.bidang[0];
-          document.getElementById('ukuran0').value = data.ukuran[0];
+          document.getElementById('ukuran0').value = (data.ukuran[0]) ? data.ukuran[0]:"0";
           document.getElementById('pemakainn0').value = (data.pemakaian[0]) ? data.pemakaian[0]:"";
-          document.getElementById('hrga0').value = data.hrga[0];
+          document.getElementById('hrga0').value = (data.hrga[0]) ? data.hrga[0]:"0";
           if (data.nama_kain.length >x) {
             for (var i = 1; i < data.nama_kain.length; i++) {              
               edit(i,data.nama_kain[i],data.bidang[i],data.ukuran[i],data.pemakaian[i],data.hrga[i]);
@@ -409,24 +461,26 @@
   }
   function tambah2() {
     count += 1;
+    var uk = document.getElementById('id_barang_pesanan').value;
     var newRow=document.getElementById('table2').insertRow();
     newRow.id = "trt"+count;
     $.ajax({
         type:"POST",
         url:"<?=site_url('transaksi_pemesanan/tabel2');?>", 
-        data : {a:count},  
+        data : {a:count,b:uk},  
         success: function(data){   
             newRow.innerHTML=data;
         }  
     });
   }
   function edit(i,nama_kain,bidang,ukuran,pemakainn,hrga) {
+    var uk = document.getElementById('id_barang_pesanan').value;
     var newRow=document.getElementById('table2').insertRow();
       newRow.id = "trt"+i;
       $.ajax({
           type:"POST",
           url:"<?=site_url('transaksi_pemesanan/tabel2');?>", 
-          data : {a:i},  
+          data : {a:i,b:uk},  
           success: function(data){   
               newRow.innerHTML=data;            
               document.getElementById('nama_kain'+i).value = nama_kain;
@@ -510,5 +564,16 @@
   }
   function jm(a) {
     document.getElementById('jml_pembayaran').value = a;
+  }
+  function nama(a,b) {
+    $.ajax({
+        type:"POST",
+        url:"<?=site_url('transaksi_pemesanan/gantinama');?>", 
+        data : {a:a,b:b},
+        success: function(data){   
+           alert(data);
+          // alert(b);
+        }  
+    });
   }
 </script>
